@@ -179,7 +179,7 @@ export default function SalesPage() {
             </div>
             <div>
               <label className="block text-sm font-semibold mb-1">Quantity *</label>
-              <InputNumber value={quantity} onValueChange={(e) => setQuantity(e.value)} showButtons min={1} max={selectedSeva?.maxTickets && selectedSeva.maxTickets > 0 ? selectedSeva.availableTickets : 100} className="w-full" />
+              <InputNumber value={quantity} onValueChange={(e) => setQuantity(e.value ?? null)} showButtons min={1} max={selectedSeva?.maxTickets && selectedSeva.maxTickets > 0 ? selectedSeva.availableTickets : 100} className="w-full" />
             </div>
             <div>
               <label className="block text-sm font-semibold mb-1">Payment Mode</label>

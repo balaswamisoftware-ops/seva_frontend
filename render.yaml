@@ -1,0 +1,51 @@
+# Render.com infrastructure-as-code for the Seva ERP frontend.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# To deploy:
+#   1. Push this file to the GitHub repo (already done if you're reading this).
+#   2. In the Render dashboard go to New + → Blueprint.
+#   3. Pick the seva_frontend repo. Render reads this file and creates the
+#      Static Site service automatically. Click "Apply".
+#   4. After the first deploy you'll get a https://seva-frontend-XXXX.onrender.com URL.
+
+services:
+  - type: web
+    name: seva-frontend
+    runtime: static
+    plan: free
+    repo: https://github.com/balaswamisoftware-ops/seva_frontend
+    branch: main
+    autoDeploy: true
+
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+
+    # SPA routing — React Router owns the URL, so any non-asset request must
+    # serve index.html and let the client-side router pick the page.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://admin-backed-zfu7.onrender.com/api/v1
+      - key: NODE_VERSION
+        value: 20
+
+    # Long-cache the fingerprinted assets Vite emits to /assets, but never
+    # cache index.html, sw.js, or manifest.webmanifest so users get fresh
+    # bundle pointers + service worker the next time they refresh.
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
+      - path: /manifest.webmanifest
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
