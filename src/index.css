@@ -1,0 +1,102 @@
+/* PrimeReact theme + icons + flex — must come first so PostCSS doesn't hoist
+   them above @tailwind utilities (where Tailwind's .grid would override
+   PrimeFlex's .grid and break flex-wrap layouts like the login keypad).
+   primeicons is kept because PrimeReact's own theme references pi-* classes
+   for built-in component glyphs (dropdown chevrons, dialog close, etc.).
+   Phosphor icons are imported from main.tsx instead — Vite's CSS @import
+   resolver chokes on scoped package names. */
+@import 'primereact/resources/themes/lara-light-amber/theme.css';
+@import 'primeicons/primeicons.css';
+@import 'primeflex/primeflex.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tailwind's `.grid` utility (display:grid) overrides PrimeFlex's `.grid`
+   (display:flex; flex-wrap:wrap) because Tailwind utilities are emitted
+   after the @import. Restore PrimeFlex behavior — we do not use Tailwind's
+   `grid-cols-*` anywhere, so display:flex is safe. */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -0.5rem;
+  margin-left: -0.5rem;
+  margin-top: -0.5rem;
+}
+.grid > [class*='col'] {
+  box-sizing: border-box;
+  padding: 0.5rem;
+}
+
+html, body, #root { height: 100%; margin: 0; font-family: 'Inter', system-ui, sans-serif; background: #fafaf9; }
+
+/* spiritual gradient for login */
+.spiritual-bg {
+  background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 50%, #fcd34d 100%);
+}
+
+/* receipt preview - monospaced */
+.receipt-preview {
+  font-family: 'Courier New', monospace;
+  white-space: pre;
+  background: white;
+  padding: 12px;
+  border: 1px dashed #d4d4d4;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Compact PrimeReact Calendar panel — applied via panelClassName="compact-calendar"
+   to shrink the date picker popup on Event create/edit. */
+.p-datepicker.compact-calendar {
+  font-size: 12px;
+  min-width: auto;
+  padding: 0.25rem;
+}
+.p-datepicker.compact-calendar .p-datepicker-header {
+  padding: 0.25rem 0.5rem;
+}
+.p-datepicker.compact-calendar .p-datepicker-title {
+  font-size: 13px;
+}
+.p-datepicker.compact-calendar table {
+  margin: 0;
+  font-size: 12px;
+}
+.p-datepicker.compact-calendar table th,
+.p-datepicker.compact-calendar table td {
+  padding: 0;
+}
+.p-datepicker.compact-calendar table td > span {
+  width: 1.85rem;
+  height: 1.85rem;
+  line-height: 1.85rem;
+  border-radius: 999px;
+}
+.p-datepicker.compact-calendar .p-datepicker-prev,
+.p-datepicker.compact-calendar .p-datepicker-next {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+/* PIN keypad */
+.pin-key {
+  width: 64px; height: 64px;
+  border-radius: 16px;
+  font-size: 1.5rem; font-weight: 600;
+  background: #fffbeb; color: #92400e;
+  border: 1px solid #fcd34d;
+  transition: all .15s;
+}
+.pin-key:hover { background: #fde68a; transform: translateY(-1px); }
+.pin-key:active { transform: translateY(0); background: #fcd34d; }
+.pin-dot { width: 14px; height: 14px; border-radius: 50%; background: #fef3c7; border: 2px solid #d97706; }
+.pin-dot.filled { background: #d97706; }
+
+/* print rules */
+@media print {
+  body * { visibility: hidden; }
+  #print-root, #print-root * { visibility: visible; }
+  #print-root { position: absolute; left: 0; top: 0; }
+}

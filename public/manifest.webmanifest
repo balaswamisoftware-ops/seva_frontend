@@ -1,0 +1,13 @@
+{
+  "name": "Seva ERP",
+  "short_name": "Seva ERP",
+  "description": "Spiritual Organization Event & Seva Management",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fef3c7",
+  "theme_color": "#b45309",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
