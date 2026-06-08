@@ -8,13 +8,14 @@ import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Tag } from 'primereact/tag';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
-import { Card } from 'primereact/card';
 import { employeesApi } from '@/api';
 import type { Employee, Role } from '@/types';
 import { toastSuccess, toastError } from '@/components/toast';
 import { apiErrorMessage, formatDateTime, fullName } from '@/utils/format';
+import PageHeader from '@/components/PageHeader';
 
 const ROLE_OPTIONS = [{ label: 'Super Admin', value: 'SUPER_ADMIN' }, { label: 'Admin', value: 'ADMIN' }];
+const initials = (name: string) => name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase() || '?';
 
 export default function EmployeesPage() {
   const queryClient = useQueryClient();
@@ -82,19 +83,25 @@ export default function EmployeesPage() {
   };
 
   return (
-    <Card>
+    <div className="flex flex-column gap-3">
       <ConfirmDialog />
-      <div className="flex justify-content-between align-items-center mb-3 gap-3 flex-wrap">
-        <div className="flex align-items-center gap-2">
-          <span className="p-input-icon-left">
-            <i className="ph ph-magnifying-glass" />
-            <InputText placeholder="Search..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
-          </span>
-        </div>
-        <Button label="New Employee" icon="ph ph-plus" onClick={openCreate} style={{ background: '#b45309', borderColor: '#b45309' }} />
+      <PageHeader
+        icon="ph ph-users"
+        title="Employees"
+        subtitle="Manage staff accounts, roles and PIN access."
+        actions={<Button label="New Employee" icon="ph ph-plus" onClick={openCreate} className="p-button-rounded" style={{ background: '#fff', borderColor: '#fff', color: '#b45309' }} />}
+      />
+
+      <div className="soft-card flex align-items-center gap-2 flex-wrap">
+        <span className="p-input-icon-left">
+          <i className="ph ph-magnifying-glass" />
+          <InputText placeholder="Search..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
+        </span>
       </div>
 
+      <div className="soft-card p-0" style={{ overflow: 'hidden' }}>
       <DataTable
+        className="fancy-table"
         value={data?.items ?? []}
         loading={isLoading}
         paginator
@@ -105,8 +112,18 @@ export default function EmployeesPage() {
         onPage={(e) => setPage((e.page ?? 0) + 1)}
         emptyMessage="No employees found"
       >
-        <Column field="employeeId" header="ID" />
-        <Column header="Name" body={(r: Employee) => fullName(r)} />
+        <Column
+          header="Name"
+          body={(r: Employee) => (
+            <div className="flex align-items-center gap-2">
+              <div className="ini-avatar">{initials(fullName(r))}</div>
+              <div>
+                <div className="font-semibold text-900">{fullName(r)}</div>
+                <div className="text-xs text-500">{r.employeeId}</div>
+              </div>
+            </div>
+          )}
+        />
         <Column field="mobileNumber" header="Mobile" />
         <Column field="email" header="Email" body={(r: Employee) => r.email ?? '—'} />
         <Column field="role" header="Role" body={(r: Employee) => <Tag severity={r.role === 'SUPER_ADMIN' ? 'danger' : 'info'} value={r.role} />} />
@@ -129,9 +146,20 @@ export default function EmployeesPage() {
           )}
         />
       </DataTable>
+      </div>
 
       {/* Editor */}
-      <Dialog header={editing ? 'Edit Employee' : 'New Employee'} visible={editorOpen} onHide={reset} style={{ width: 480 }}>
+      <Dialog
+        header={
+          <div className="flex align-items-center gap-2">
+            <span className="page-head__icon" style={{ width: 38, height: 38, fontSize: 18, background: '#fef3c7', color: '#b45309', border: 'none' }}>
+              <i className={editing ? 'ph ph-pencil-simple' : 'ph ph-user-plus'} />
+            </span>
+            <span>{editing ? 'Edit Employee' : 'New Employee'}</span>
+          </div>
+        }
+        visible={editorOpen} onHide={reset} style={{ width: 480 }}
+      >
         <div className="flex flex-column gap-3">
           <div className="grid">
             <div className="col-6">
@@ -169,7 +197,17 @@ export default function EmployeesPage() {
       </Dialog>
 
       {/* PIN reset */}
-      <Dialog header={`Reset PIN — ${pinDialog.employee ? fullName(pinDialog.employee) : ''}`} visible={pinDialog.open} onHide={() => setPinDialog({ open: false, newPin: '' })} style={{ width: 380 }}>
+      <Dialog
+        header={
+          <div className="flex align-items-center gap-2">
+            <span className="page-head__icon" style={{ width: 38, height: 38, fontSize: 18, background: '#fef3c7', color: '#b45309', border: 'none' }}>
+              <i className="ph ph-key" />
+            </span>
+            <span>{`Reset PIN — ${pinDialog.employee ? fullName(pinDialog.employee) : ''}`}</span>
+          </div>
+        }
+        visible={pinDialog.open} onHide={() => setPinDialog({ open: false, newPin: '' })} style={{ width: 380 }}
+      >
         <div className="flex flex-column gap-3">
           <div>
             <label className="block text-sm font-semibold mb-1">New PIN (4-6 digits)</label>
@@ -188,6 +226,6 @@ export default function EmployeesPage() {
           </div>
         </div>
       </Dialog>
-    </Card>
+    </div>
   );
 }

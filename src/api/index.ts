@@ -1,6 +1,7 @@
 import { api, unwrap } from './client';
 import type {
   Employee, Event, Seva, Ticket, OrgSettings, Paginated, ReceiptPayload, Role, Status, PaymentMode, EventStatus, SevaStatus, DonationPurpose,
+  Devotee, EventParticipation, AuditEntry, AuditEntityType, AuditActionType,
 } from '@/types';
 
 // ---- Auth ----
@@ -86,6 +87,38 @@ export const donationPurposesApi = {
     api.patch(`/donation-purposes/${id}/status`).then(unwrap<DonationPurpose>),
 };
 
+// ---- Devotees ----
+export const devoteesApi = {
+  list: (params?: { page?: number; limit?: number; search?: string }) =>
+    api.get<{ data: Paginated<Devotee> }>('/devotees', { params }).then((r) => r.data.data),
+  get: (id: string) => api.get(`/devotees/${id}`).then(unwrap<Devotee>),
+  lookup: (phone: string) =>
+    api.get('/devotees/lookup', { params: { phone } }).then(unwrap<Devotee | null>),
+  create: (data: { fullName: string; phoneNumber: string; gothram?: string; nakshatram?: string }) =>
+    api.post('/devotees', data).then(unwrap<Devotee>),
+  update: (id: string, data: Partial<Devotee>) => api.put(`/devotees/${id}`, data).then(unwrap<Devotee>),
+  remove: (id: string) => api.delete(`/devotees/${id}`),
+};
+
+// ---- Event Participations ----
+export const participationsApi = {
+  list: (params?: { page?: number; limit?: number; eventId?: string; devoteeId?: string; search?: string }) =>
+    api.get<{ data: Paginated<EventParticipation> }>('/participations', { params }).then((r) => r.data.data),
+  create: (data: {
+    eventId: string; phoneNumber?: string; fullName?: string; gothram?: string; nakshatram?: string;
+    sevaId?: string; quantity?: number; paymentMode?: PaymentMode; notes?: string;
+  }) => api.post('/participations', data).then((r) => r.data as { success: boolean; message: string; data: EventParticipation; devoteeCreated: boolean }),
+  remove: (id: string) => api.delete(`/participations/${id}`),
+};
+
+// ---- Audit Log (Super Admin only) ----
+export const auditApi = {
+  list: (params?: { page?: number; limit?: number; entityType?: AuditEntityType; action?: AuditActionType; entityId?: string }) =>
+    api.get<{ data: Paginated<AuditEntry> }>('/audit', { params }).then((r) => r.data.data),
+  rollback: (id: string) =>
+    api.post(`/audit/${id}/rollback`).then((r) => r.data as { success: boolean; message: string }),
+};
+
 // ---- Org Settings ----
 export const orgApi = {
   get: () => api.get('/org').then(unwrap<OrgSettings>),
@@ -104,3 +137,4 @@ export const printersApi = {
   print:  (ticketId: string, printerId?: string) =>
     api.post('/printers/print', { ticketId, printerId }).then(unwrap<PrintResult>),
 };
+

@@ -6,7 +6,6 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { Tag } from 'primereact/tag';
-import { Card } from 'primereact/card';
 import { Dialog } from 'primereact/dialog';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { donationsApi } from '@/api/donations';
@@ -16,6 +15,7 @@ import { formatINR, formatDateTime, apiErrorMessage } from '@/utils/format';
 import { renderReceiptText } from '@/utils/printReceipt';
 import { printDonationA4 } from '@/utils/printDonationA4';
 import { toastSuccess, toastError } from '@/components/toast';
+import PageHeader from '@/components/PageHeader';
 
 export default function DonationsHistoryPage() {
   const queryClient = useQueryClient();
@@ -74,27 +74,33 @@ export default function DonationsHistoryPage() {
     });
 
   return (
-    <Card>
+    <div className="flex flex-column gap-3">
       <ConfirmDialog />
-      <div className="flex justify-content-between mb-3 flex-wrap gap-2">
-        <div className="flex gap-2 flex-1">
-          <span className="p-input-icon-left" style={{ minWidth: 220 }}>
-            <i className="ph ph-magnifying-glass" />
-            <InputText placeholder="Receipt / PAN / name / mobile" value={search} onChange={(e) => setSearch(e.target.value)} />
-          </span>
-          <Calendar
-            value={range as any}
-            onChange={(e) => { setRange((e.value as any) ?? [null, null]); setPage(1); }}
-            selectionMode="range" readOnlyInput dateFormat="dd M yy"
-            placeholder="Date range" showButtonBar
-          />
-        </div>
-        <div className="font-semibold text-lg align-self-center" style={{ color: '#b45309' }}>
+      <PageHeader
+        icon="ph ph-list-checks"
+        title="Donation History"
+        subtitle="Search past donations and reprint 80G receipts."
+      />
+
+      <div className="soft-card flex align-items-center gap-2 flex-wrap">
+        <span className="p-input-icon-left" style={{ minWidth: 220 }}>
+          <i className="ph ph-magnifying-glass" />
+          <InputText placeholder="Receipt / PAN / name / mobile" value={search} onChange={(e) => setSearch(e.target.value)} />
+        </span>
+        <Calendar
+          value={range as any}
+          onChange={(e) => { setRange((e.value as any) ?? [null, null]); setPage(1); }}
+          selectionMode="range" readOnlyInput dateFormat="dd M yy"
+          placeholder="Date range" showButtonBar
+        />
+        <div className="font-semibold text-lg ml-auto" style={{ color: '#b45309' }}>
           Total: {formatINR(data?.totalAmount ?? 0)} ({data?.total ?? 0})
         </div>
       </div>
 
+      <div className="soft-card p-0" style={{ overflow: 'hidden' }}>
       <DataTable
+        className="fancy-table"
         value={data?.items ?? []}
         loading={isLoading}
         paginator lazy
@@ -108,7 +114,7 @@ export default function DonationsHistoryPage() {
         <Column field="devoteeName"   header="Donor" />
         <Column field="panNumber"     header="PAN" body={(r: Donation) => r.panNumber ?? '—'} />
         <Column field="purpose"       header="Purpose" />
-        <Column header="Amount" body={(r: Donation) => <b style={{ color: '#b45309' }}>{formatINR(Number(r.amount))}</b>} />
+        <Column header="Amount" body={(r: Donation) => <span style={{ color: '#b45309', fontWeight: 700 }}>{formatINR(Number(r.amount))}</span>} />
         <Column header="Payment" body={(r: Donation) => <Tag value={r.paymentMode} />} />
         <Column header="80G" body={(r: Donation) => (
           r.is80GEligible
@@ -131,8 +137,19 @@ export default function DonationsHistoryPage() {
           </div>
         )} />
       </DataTable>
+      </div>
 
-      <Dialog header="Reprint Receipt" visible={receipt.open} onHide={() => setReceipt({ open: false })} style={{ width: 460 }}>
+      <Dialog
+        header={
+          <div className="flex align-items-center gap-2">
+            <span className="page-head__icon" style={{ width: 38, height: 38, fontSize: 18, background: '#fef3c7', color: '#b45309', border: 'none' }}>
+              <i className="ph ph-printer" />
+            </span>
+            <span>Reprint Receipt</span>
+          </div>
+        }
+        visible={receipt.open} onHide={() => setReceipt({ open: false })} style={{ width: 460 }}
+      >
         {receipt.data && (
           <>
             <div className="receipt-preview">{renderReceiptText(receipt.data as any)}</div>
@@ -155,7 +172,17 @@ export default function DonationsHistoryPage() {
         )}
       </Dialog>
 
-      <Dialog header="80G Tax Certificate" visible={certDialog.open} onHide={() => setCertDialog({ open: false })} style={{ width: 640 }}>
+      <Dialog
+        header={
+          <div className="flex align-items-center gap-2">
+            <span className="page-head__icon" style={{ width: 38, height: 38, fontSize: 18, background: '#fef3c7', color: '#b45309', border: 'none' }}>
+              <i className="ph ph-file" />
+            </span>
+            <span>80G Tax Certificate</span>
+          </div>
+        }
+        visible={certDialog.open} onHide={() => setCertDialog({ open: false })} style={{ width: 640 }}
+      >
         {certDialog.data && (
           <div className="p-3" style={{ border: '2px solid #b45309' }}>
             <div className="text-center mb-3">
@@ -189,6 +216,6 @@ export default function DonationsHistoryPage() {
           </div>
         )}
       </Dialog>
-    </Card>
+    </div>
   );
 }

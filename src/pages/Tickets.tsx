@@ -6,7 +6,6 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { Tag } from 'primereact/tag';
-import { Card } from 'primereact/card';
 import { Dialog } from 'primereact/dialog';
 import { ticketsApi } from '@/api';
 import type { Ticket, ReceiptPayload } from '@/types';
@@ -14,6 +13,7 @@ import { formatDateTime, formatINR } from '@/utils/format';
 import { renderReceiptText } from '@/utils/printReceipt';
 import { smartPrint } from '@/utils/printBridge';
 import { toastError, toastSuccess, toastInfo } from '@/components/toast';
+import PageHeader from '@/components/PageHeader';
 
 export default function TicketsPage() {
   const [page, setPage] = useState(1);
@@ -49,8 +49,14 @@ export default function TicketsPage() {
   };
 
   return (
-    <Card>
-      <div className="flex flex-wrap gap-2 mb-3">
+    <div className="flex flex-column gap-3">
+      <PageHeader
+        icon="ph ph-ticket"
+        title="Tickets"
+        subtitle="Browse and reprint issued seva tickets."
+      />
+
+      <div className="soft-card flex align-items-center gap-2 flex-wrap">
         <span className="p-input-icon-left flex-1" style={{ minWidth: 200 }}>
           <i className="ph ph-magnifying-glass" />
           <InputText placeholder="Receipt / booking / devotee / mobile" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="w-full" />
@@ -63,7 +69,9 @@ export default function TicketsPage() {
         />
       </div>
 
+      <div className="soft-card p-0" style={{ overflow: 'hidden' }}>
       <DataTable
+        className="fancy-table"
         value={data?.items ?? []}
         loading={isLoading}
         paginator lazy
@@ -79,7 +87,7 @@ export default function TicketsPage() {
         <Column header="Seva" body={(r: Ticket) => r.sevaName} />
         <Column field="devoteeName" header="Devotee" />
         <Column field="quantity" header="Qty" />
-        <Column header="Amount" body={(r: Ticket) => <b style={{ color: '#b45309' }}>{formatINR(Number(r.totalAmount))}</b>} />
+        <Column header="Amount" body={(r: Ticket) => <span style={{ color: '#b45309', fontWeight: 700 }}>{formatINR(Number(r.totalAmount))}</span>} />
         <Column header="Payment" body={(r: Ticket) => <Tag value={r.paymentMode} />} />
         <Column header="Sold By" body={(r: Ticket) => r.soldByName} />
         <Column header="Sold At" body={(r: Ticket) => formatDateTime(r.soldAt)} />
@@ -87,8 +95,19 @@ export default function TicketsPage() {
           <Button icon="ph ph-printer" rounded text tooltip="Reprint" onClick={() => reprint(r._id)} />
         )} />
       </DataTable>
+      </div>
 
-      <Dialog header="Reprint Receipt" visible={receipt.open} onHide={() => setReceipt({ open: false })} style={{ width: 460 }}>
+      <Dialog
+        header={
+          <div className="flex align-items-center gap-2">
+            <span className="page-head__icon" style={{ width: 38, height: 38, fontSize: 18, background: '#fef3c7', color: '#b45309', border: 'none' }}>
+              <i className="ph ph-ticket" />
+            </span>
+            <span>Reprint Receipt</span>
+          </div>
+        }
+        visible={receipt.open} onHide={() => setReceipt({ open: false })} style={{ width: 460 }}
+      >
         {receipt.data && (
           <>
             <div className="receipt-preview">
@@ -106,6 +125,6 @@ export default function TicketsPage() {
           </>
         )}
       </Dialog>
-    </Card>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card } from 'primereact/card';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
@@ -17,6 +16,7 @@ import { renderReceiptText } from '@/utils/printReceipt';
 import { smartPrint } from '@/utils/printBridge';
 import { sellTicketSmart } from '@/utils/sellTicketSmart';
 import { useAuthStore } from '@/store/auth';
+import PageHeader from '@/components/PageHeader';
 
 const PAYMENT_OPTIONS: { label: string; value: PaymentMode }[] = [
   { label: 'Cash',  value: 'CASH' },
@@ -105,113 +105,124 @@ export default function SalesPage() {
   };
 
   return (
-    <div className="grid">
-      {/* LEFT: Event + Sevas */}
-      <div className="col-12 lg:col-7">
-        <Card title="1. Select Ongoing Event" className="mb-3">
-          <Dropdown
-            value={selectedEvent}
-            onChange={(e) => { setSelectedEvent(e.value); setSelectedSeva(null); }}
-            options={events}
-            optionLabel="eventName"
-            placeholder={eventsLoading ? 'Loading...' : 'Choose event'}
-            className="w-full"
-            disabled={eventsLoading}
-            itemTemplate={(o: Event) => (
-              <div className="flex flex-column">
-                <span className="font-semibold">{o.eventName}</span>
-                <span className="text-xs text-500">{o.eventId} · {o.location ?? '—'}</span>
-              </div>
-            )}
-            emptyMessage="No ongoing events. Create or mark an event ONGOING first."
-          />
-        </Card>
+    <div className="flex flex-column gap-3">
+      <PageHeader
+        icon="ph ph-shopping-cart"
+        title="Counter Sales"
+        subtitle="Sell seva tickets at the counter and print receipts."
+      />
 
-        <Card title="2. Select Seva">
-          {!selectedEvent && <div className="text-500 text-center p-4">Pick an event first.</div>}
-          {selectedEvent && sevasLoading && <div className="text-500 text-center p-4">Loading sevas...</div>}
-          {selectedEvent && !sevasLoading && sevas.length === 0 && (
-            <div className="text-500 text-center p-4">No active sevas for this event.</div>
-          )}
-          {selectedEvent && !sevasLoading && sevas.length > 0 && (
-            <div className="grid">
-              {sevas.map((s) => {
-                const limited = s.maxTickets > 0;
-                const isSelected = selectedSeva?._id === s._id;
-                const disabled = s.status !== 'ACTIVE' || (limited && s.availableTickets <= 0);
-                return (
-                  <div className="col-6 md:col-4" key={s._id}>
-                    <div
-                      onClick={() => !disabled && setSelectedSeva(s)}
-                      className={`p-3 border-round cursor-pointer transition-all transition-duration-150 ${
-                        isSelected ? 'border-2 surface-200' : 'border-1 surface-card'
-                      } ${disabled ? 'opacity-50' : 'hover:surface-100'}`}
-                      style={{ borderColor: isSelected ? '#b45309' : '#e5e7eb' }}
-                    >
-                      <div className="font-semibold">{s.sevaName}</div>
-                      <div className="text-xl font-bold mt-1" style={{ color: '#b45309' }}>{formatINR(Number(s.price))}</div>
-                      <div className="text-xs text-500 mt-1">{s.sevaId}</div>
-                      <div className="mt-2">
-                        {limited
-                          ? <Tag severity={s.availableTickets > 5 ? 'success' : 'warning'} value={`${s.availableTickets} left`} />
-                          : <Tag severity="info" value="Unlimited" />}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </Card>
-      </div>
-
-      {/* RIGHT: Devotee + Sale */}
-      <div className="col-12 lg:col-5">
-        <Card title="3. Devotee Details">
-          <div className="flex flex-column gap-3">
-            <div>
-              <label className="block text-sm font-semibold mb-1">Devotee Name *</label>
-              <InputText value={devoteeName} onChange={(e) => setDevoteeName(e.target.value)} className="w-full" placeholder="Full name" />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold mb-1">Mobile (optional)</label>
-              <InputText value={mobile} onChange={(e) => setMobile(e.target.value)} className="w-full" keyfilter="num" placeholder="+91-XXXXXXXXXX" />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold mb-1">Quantity *</label>
-              <InputNumber value={quantity} onValueChange={(e) => setQuantity(e.value ?? null)} showButtons min={1} max={selectedSeva?.maxTickets && selectedSeva.maxTickets > 0 ? selectedSeva.availableTickets : 100} className="w-full" />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold mb-1">Payment Mode</label>
-              <SelectButton value={paymentMode} onChange={(e) => setPaymentMode(e.value)} options={PAYMENT_OPTIONS} />
-            </div>
-
-            <div className="border-top-1 surface-border pt-3 mt-2">
-              <div className="flex justify-content-between mb-2">
-                <span className="text-500">Unit Price</span>
-                <span>{selectedSeva ? formatINR(Number(selectedSeva.price)) : '—'}</span>
-              </div>
-              <div className="flex justify-content-between mb-2">
-                <span className="text-500">Quantity</span>
-                <span>{quantity ?? 0}</span>
-              </div>
-              <div className="flex justify-content-between text-xl font-bold">
-                <span>TOTAL</span>
-                <span style={{ color: '#b45309' }}>{formatINR(total)}</span>
-              </div>
-            </div>
-
-            <Button
-              label={sellMutation.isPending ? 'Processing...' : `Sell & Print Receipt — ${formatINR(total)}`}
-              icon="ph ph-printer"
-              className="w-full mt-2"
-              style={{ background: '#b45309', borderColor: '#b45309' }}
-              loading={sellMutation.isPending}
-              disabled={!canSell}
-              onClick={submitSale}
+      <div className="grid">
+        {/* LEFT: Event + Sevas */}
+        <div className="col-12 lg:col-7">
+          <div className="soft-card mb-3">
+            <div className="font-semibold text-700 mb-3"><i className="ph ph-calendar-check mr-1" />1. Select Ongoing Event</div>
+            <Dropdown
+              value={selectedEvent}
+              onChange={(e) => { setSelectedEvent(e.value); setSelectedSeva(null); }}
+              options={events}
+              optionLabel="eventName"
+              placeholder={eventsLoading ? 'Loading...' : 'Choose event'}
+              className="w-full"
+              disabled={eventsLoading}
+              itemTemplate={(o: Event) => (
+                <div className="flex flex-column">
+                  <span className="font-semibold">{o.eventName}</span>
+                  <span className="text-xs text-500">{o.eventId} · {o.location ?? '—'}</span>
+                </div>
+              )}
+              emptyMessage="No ongoing events. Create or mark an event ONGOING first."
             />
           </div>
-        </Card>
+
+          <div className="soft-card">
+            <div className="font-semibold text-700 mb-3"><i className="ph ph-gift mr-1" />2. Select Seva</div>
+            {!selectedEvent && <div className="text-500 text-center p-4">Pick an event first.</div>}
+            {selectedEvent && sevasLoading && <div className="text-500 text-center p-4">Loading sevas...</div>}
+            {selectedEvent && !sevasLoading && sevas.length === 0 && (
+              <div className="text-500 text-center p-4">No active sevas for this event.</div>
+            )}
+            {selectedEvent && !sevasLoading && sevas.length > 0 && (
+              <div className="grid">
+                {sevas.map((s) => {
+                  const limited = s.maxTickets > 0;
+                  const isSelected = selectedSeva?._id === s._id;
+                  const disabled = s.status !== 'ACTIVE' || (limited && s.availableTickets <= 0);
+                  return (
+                    <div className="col-6 md:col-4" key={s._id}>
+                      <div
+                        onClick={() => !disabled && setSelectedSeva(s)}
+                        className={`p-3 border-round cursor-pointer transition-all transition-duration-150 ${
+                          isSelected ? 'border-2 surface-200' : 'border-1 surface-card'
+                        } ${disabled ? 'opacity-50' : 'hover:surface-100'}`}
+                        style={{ borderColor: isSelected ? '#b45309' : '#e5e7eb' }}
+                      >
+                        <div className="font-semibold">{s.sevaName}</div>
+                        <div className="text-xl font-bold mt-1" style={{ color: '#b45309', fontWeight: 800 }}>{formatINR(Number(s.price))}</div>
+                        <div className="text-xs text-500 mt-1">{s.sevaId}</div>
+                        <div className="mt-2">
+                          {limited
+                            ? <Tag severity={s.availableTickets > 5 ? 'success' : 'warning'} value={`${s.availableTickets} left`} />
+                            : <Tag severity="info" value="Unlimited" />}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT: Devotee + Sale */}
+        <div className="col-12 lg:col-5">
+          <div className="soft-card">
+            <div className="font-semibold text-700 mb-3"><i className="ph ph-user mr-1" />3. Devotee Details</div>
+            <div className="flex flex-column gap-3">
+              <div>
+                <label className="block text-sm font-semibold mb-1">Devotee Name *</label>
+                <InputText value={devoteeName} onChange={(e) => setDevoteeName(e.target.value)} className="w-full" placeholder="Full name" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1">Mobile (optional)</label>
+                <InputText value={mobile} onChange={(e) => setMobile(e.target.value)} className="w-full" keyfilter="num" placeholder="+91-XXXXXXXXXX" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1">Quantity *</label>
+                <InputNumber value={quantity} onValueChange={(e) => setQuantity(e.value ?? null)} showButtons min={1} max={selectedSeva?.maxTickets && selectedSeva.maxTickets > 0 ? selectedSeva.availableTickets : 100} className="w-full" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1">Payment Mode</label>
+                <SelectButton value={paymentMode} onChange={(e) => setPaymentMode(e.value)} options={PAYMENT_OPTIONS} />
+              </div>
+
+              <div className="border-top-1 surface-border pt-3 mt-2">
+                <div className="flex justify-content-between mb-2">
+                  <span className="text-500">Unit Price</span>
+                  <span>{selectedSeva ? formatINR(Number(selectedSeva.price)) : '—'}</span>
+                </div>
+                <div className="flex justify-content-between mb-2">
+                  <span className="text-500">Quantity</span>
+                  <span>{quantity ?? 0}</span>
+                </div>
+                <div className="flex justify-content-between text-xl">
+                  <span style={{ fontWeight: 800 }}>TOTAL</span>
+                  <span style={{ color: '#b45309', fontWeight: 800 }}>{formatINR(total)}</span>
+                </div>
+              </div>
+
+              <Button
+                label={sellMutation.isPending ? 'Processing...' : `Sell & Print Receipt — ${formatINR(total)}`}
+                icon="ph ph-printer"
+                className="w-full mt-2"
+                style={{ background: '#b45309', borderColor: '#b45309' }}
+                loading={sellMutation.isPending}
+                disabled={!canSell}
+                onClick={submitSale}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Receipt preview dialog */}

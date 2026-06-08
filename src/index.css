@@ -80,6 +80,25 @@ html, body, #root { height: 100%; margin: 0; font-family: 'Inter', system-ui, sa
   height: 1.75rem;
 }
 
+/* When date-range is the selection mode the highlighted span fills the cell
+   end-to-end so each row looks like a continuous bar instead of stacked
+   pills. Tightens the touch target too. */
+.p-datepicker.compact-calendar table td.p-datepicker-other-month {
+  opacity: 0.45;
+}
+.p-datepicker.compact-calendar .p-datepicker-buttonbar {
+  padding: 0.35rem 0.5rem;
+  border-top: 1px solid #f1ecdf;
+}
+.p-datepicker.compact-calendar .p-datepicker-buttonbar .p-button {
+  padding: 0.25rem 0.55rem;
+  font-size: 12px;
+}
+.p-datepicker.compact-calendar table td > span.p-highlight {
+  background: #b45309;
+  color: #fff;
+}
+
 /* PIN keypad */
 .pin-key {
   width: 64px; height: 64px;
@@ -93,6 +112,175 @@ html, body, #root { height: 100%; margin: 0; font-family: 'Inter', system-ui, sa
 .pin-key:active { transform: translateY(0); background: #fcd34d; }
 .pin-dot { width: 14px; height: 14px; border-radius: 50%; background: #fef3c7; border: 2px solid #d97706; }
 .pin-dot.filled { background: #d97706; }
+
+/* ── Polished page chrome (Devotees / Participation / Audit) ──────────── */
+.page-head {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1.1rem 1.35rem; border-radius: 18px;
+  background: linear-gradient(135deg, #b45309 0%, #d97706 55%, #f59e0b 100%);
+  color: #fff; position: relative; overflow: hidden;
+  box-shadow: 0 12px 28px -14px rgba(180, 83, 9, .6);
+}
+.page-head::after {
+  content: ''; position: absolute; right: -40px; top: -60px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, .16) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+}
+.page-head__icon {
+  width: 54px; height: 54px; border-radius: 15px; flex: none;
+  display: flex; align-items: center; justify-content: center; font-size: 26px;
+  background: rgba(255, 255, 255, .18); border: 1px solid rgba(255, 255, 255, .28);
+}
+.page-head__title { font-size: 1.4rem; font-weight: 800; line-height: 1.1; }
+.page-head__sub   { font-size: .82rem; opacity: .92; margin-top: 3px; max-width: 56ch; }
+.page-head .p-button { z-index: 1; }
+
+/* summary stat cards */
+.stat-row  { display: flex; gap: .75rem; flex-wrap: wrap; }
+.stat-card {
+  flex: 1 1 160px; background: #fff; border: 1px solid #f1ecdf;
+  border-radius: 14px; padding: .75rem 1rem; box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
+  display: flex; align-items: center; gap: .75rem;
+}
+.stat-card__ico {
+  width: 38px; height: 38px; border-radius: 11px; flex: none;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+  background: #fef3c7; color: #b45309;
+}
+.stat-card__label { font-size: .68rem; text-transform: uppercase; letter-spacing: .5px; color: #a16207; font-weight: 700; }
+.stat-card__value { font-size: 1.4rem; font-weight: 800; color: #92400e; line-height: 1.1; }
+
+/* soft container card */
+.soft-card {
+  background: #fff; border: 1px solid #f1ecdf; border-radius: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .04); padding: 1rem 1.1rem;
+}
+
+/* highlighted toggle inside dialogs */
+.toggle-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .9rem 1rem; border-radius: 14px;
+  background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 1px solid #fcd34d;
+  transition: all .18s ease;
+}
+.toggle-card.is-on { background: linear-gradient(135deg, #fff7ed, #fde68a); border-color: #d97706; }
+.toggle-card__title { font-weight: 700; color: #92400e; display: flex; align-items: center; gap: .4rem; }
+
+/* refined DataTable */
+.fancy-table .p-datatable-thead > tr > th {
+  background: #fffbeb; color: #92400e; font-weight: 700; font-size: .78rem;
+  text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid #fde68a;
+}
+.fancy-table .p-datatable-tbody > tr { transition: background .12s; }
+.fancy-table .p-datatable-tbody > tr:hover { background: #fffbeb !important; }
+.fancy-table .p-datatable-tbody > tr > td { border-bottom: 1px solid #f7f3e8; }
+
+/* circular initials avatar */
+.ini-avatar {
+  width: 36px; height: 36px; border-radius: 50%; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: .82rem; color: #92400e;
+  background: #fde68a; border: 1px solid #fcd34d;
+}
+
+/* ── Metric tiles (Dashboard / Reports) ──────────────────────────────── */
+.metric {
+  position: relative; background: #fff; border: 1px solid #f1ecdf;
+  border-radius: 16px; padding: 1.05rem 1.15rem; height: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+  transition: transform .16s ease, box-shadow .16s ease; overflow: hidden;
+}
+.metric:hover { transform: translateY(-2px); box-shadow: 0 12px 26px -16px rgba(0, 0, 0, .3); }
+.metric::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent, #b45309); }
+.metric__top { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; }
+.metric__ico {
+  width: 44px; height: 44px; border-radius: 12px; flex: none;
+  display: flex; align-items: center; justify-content: center; font-size: 21px;
+  color: var(--accent, #b45309);
+}
+.metric__label { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: #94928c; }
+.metric__value { font-size: 1.7rem; font-weight: 800; color: #1f2937; line-height: 1.15; margin-top: 4px; }
+.metric__sub   { font-size: .74rem; color: #9a9690; margin-top: 4px; }
+
+.metric--hero { background: linear-gradient(135deg, #b45309 0%, #d97706 58%, #f59e0b 100%); border: none; color: #fff; }
+.metric--hero::before { display: none; }
+.metric--hero .metric__ico { background: rgba(255, 255, 255, .2); color: #fff; }
+.metric--hero .metric__label { color: rgba(255, 255, 255, .85); }
+.metric--hero .metric__value { color: #fff; font-size: 2rem; }
+.metric--hero .metric__sub { color: rgba(255, 255, 255, .9); }
+.metric--hero::after {
+  content: ''; position: absolute; right: -30px; top: -50px;
+  width: 170px; height: 170px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, .18) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+}
+
+/* ── Modern KPI cards + dashboard panels ─────────────────────────────── */
+.kpi {
+  background: #fff; border: 1px solid #f0ece2; border-radius: 20px;
+  padding: 1.15rem 1.25rem; height: 100%; box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
+  transition: box-shadow .18s ease, transform .18s ease;
+}
+.kpi:hover { box-shadow: 0 16px 32px -20px rgba(0, 0, 0, .35); transform: translateY(-2px); }
+.kpi__head { display: flex; align-items: center; gap: .6rem; margin-bottom: .7rem; }
+.kpi__ico { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 19px; flex: none; }
+.kpi__label { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: #9a9690; }
+.kpi__value { font-size: 1.8rem; font-weight: 800; color: #1f2937; line-height: 1.1; }
+.kpi__foot { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: .7rem; min-height: 20px; }
+.kpi__sub { font-size: .74rem; color: #9a9690; }
+.delta { display: inline-flex; align-items: center; gap: 3px; font-size: .74rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; }
+.delta.up   { color: #047857; background: #ecfdf5; }
+.delta.down { color: #b91c1c; background: #fef2f2; }
+.delta.flat { color: #6b7280; background: #f3f4f6; }
+
+.panel { background: #fff; border: 1px solid #f0ece2; border-radius: 20px; box-shadow: 0 1px 2px rgba(0, 0, 0, .03); padding: 1.15rem 1.3rem; height: 100%; }
+.panel__title { font-weight: 800; color: #92400e; font-size: 1.05rem; }
+.panel__sub { font-size: .78rem; color: #9a9690; margin-top: 2px; }
+
+.donut-wrap { position: relative; }
+.donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+.donut-center small { color: #9a9690; font-size: .68rem; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; }
+.donut-center b { font-size: 1.3rem; color: #1f2937; }
+.mix-row { display: flex; align-items: center; justify-content: space-between; padding: .35rem 0; font-size: .85rem; }
+.mix-row .lg__dot { width: 9px; height: 9px; }
+
+.lead { display: flex; align-items: center; gap: .8rem; padding: .55rem 0; }
+.lead__rank { width: 26px; height: 26px; border-radius: 8px; background: #fffbeb; color: #b45309; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: .8rem; flex: none; }
+.lead__body { flex: 1; min-width: 0; }
+.lead__name { font-weight: 600; color: #1f2937; font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lead__bar { height: 7px; border-radius: 999px; background: #f1ecdf; margin-top: 6px; overflow: hidden; }
+.lead__fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #f59e0b, #b45309); }
+.lead__val { font-weight: 800; color: #b45309; font-size: .85rem; flex: none; }
+
+/* chart card */
+.chart-card { background: #fff; border: 1px solid #f1ecdf; border-radius: 18px; box-shadow: 0 1px 3px rgba(0, 0, 0, .04); padding: 1.1rem 1.25rem; }
+.chart-card__head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem; margin-bottom: .75rem; }
+.chart-card__title { font-weight: 800; color: #92400e; font-size: 1.05rem; }
+.lg { display: flex; gap: 1rem; flex-wrap: wrap; }
+.lg__item { display: inline-flex; align-items: center; font-size: .8rem; color: #6b7280; font-weight: 600; }
+.lg__dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+/* pill tabs (Reports) */
+.fancy-tabs .p-tabview-nav { border: none; gap: .4rem; background: transparent; }
+.fancy-tabs .p-tabview-nav li .p-tabview-nav-link {
+  border: none; border-radius: 999px; padding: .55rem 1.1rem; margin: 0;
+  color: #92400e; background: #fffbeb; font-weight: 700; transition: all .15s;
+}
+.fancy-tabs .p-tabview-nav li .p-tabview-nav-link:hover { background: #fde68a; }
+.fancy-tabs .p-tabview-nav li.p-highlight .p-tabview-nav-link { background: #b45309; color: #fff; box-shadow: 0 6px 14px -8px rgba(180, 83, 9, .8); }
+.fancy-tabs .p-tabview-panels { background: transparent; padding: 1.1rem 0 0; border: none; }
+
+/* before/after diff blocks in audit */
+.diff-pane { border-radius: 12px; overflow: hidden; border: 1px solid #f1ecdf; }
+.diff-pane__head { padding: .5rem .8rem; font-weight: 700; font-size: .8rem; }
+.diff-pane__body {
+  margin: 0; padding: .8rem; font-size: 12px; line-height: 1.5; max-height: 440px;
+  overflow: auto; font-family: 'JetBrains Mono', 'Courier New', monospace; white-space: pre-wrap;
+  background: #fcfbf7;
+}
+.diff-before .diff-pane__head { background: #fef2f2; color: #b91c1c; }
+.diff-after  .diff-pane__head { background: #ecfdf5; color: #047857; }
 
 /* print rules */
 @media print {

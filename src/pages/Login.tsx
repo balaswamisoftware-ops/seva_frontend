@@ -50,7 +50,9 @@ export default function LoginPage() {
     <div className="spiritual-bg flex align-items-center justify-content-center" style={{ minHeight: '100vh' }}>
       <Card className="shadow-3" style={{ width: 440 }}>
         <div className="text-center mb-4">
-          <div style={{ fontSize: 56 }}>🕉️</div>
+          <div className="inline-flex align-items-center justify-content-center mb-2" style={{ width: 72, height: 72, borderRadius: 20, background: 'linear-gradient(135deg,#b45309,#f59e0b)', color: '#fff', boxShadow: '0 14px 30px -12px rgba(180,83,9,.7)' }}>
+            <i className="ph ph-flower-lotus" style={{ fontSize: 38 }} />
+          </div>
           <h2 className="m-0" style={{ color: '#92400e' }}>Seva ERP</h2>
           <div className="text-sm text-500 mt-1">Spiritual Organization Management</div>
         </div>

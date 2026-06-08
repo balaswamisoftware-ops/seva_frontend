@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card } from 'primereact/card';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -18,6 +17,7 @@ import { formatINR, apiErrorMessage } from '@/utils/format';
 import { toastSuccess, toastError } from '@/components/toast';
 import { printDonationA4 } from '@/utils/printDonationA4';
 import { renderReceiptText } from '@/utils/printReceipt';
+import PageHeader from '@/components/PageHeader';
 
 const PAYMENT_OPTIONS: { label: string; value: PaymentMode }[] = [
   { label: 'Cash',  value: 'CASH' },
@@ -115,9 +115,20 @@ export default function DonationsPage() {
   };
 
   return (
-    <div className="grid">
+    <div className="flex flex-column gap-3">
+      <PageHeader
+        icon="ph ph-hand-heart"
+        title="Donations"
+        subtitle="Record donations and issue 80G receipts."
+      />
+
+      <div className="grid">
       <div className="col-12 lg:col-7">
-        <Card title="Donor Details">
+        <div className="soft-card">
+          <div className="flex align-items-center gap-2 mb-3">
+            <i className="ph ph-user-circle" style={{ fontSize: 20, color: '#b45309' }} />
+            <span className="font-semibold text-900">Donor Details</span>
+          </div>
           <div className="flex flex-column gap-3">
             <div className="grid">
               <div className="col-6">
@@ -184,11 +195,15 @@ export default function DonationsPage() {
               </>
             )}
           </div>
-        </Card>
+        </div>
       </div>
 
       <div className="col-12 lg:col-5">
-        <Card title="Donation Amount">
+        <div className="soft-card">
+          <div className="flex align-items-center gap-2 mb-3">
+            <i className="ph ph-coins" style={{ fontSize: 20, color: '#b45309' }} />
+            <span className="font-semibold text-900">Donation Amount</span>
+          </div>
           <div className="flex flex-column gap-3">
             <div className="flex flex-wrap gap-2">
               {PRESET_AMOUNTS.map((a) => (
@@ -242,11 +257,19 @@ export default function DonationsPage() {
               onClick={submit}
             />
           </div>
-        </Card>
+        </div>
+      </div>
       </div>
 
       <Dialog
-        header="Donation Receipt"
+        header={
+          <div className="flex align-items-center gap-2">
+            <span className="page-head__icon" style={{ width: 38, height: 38, fontSize: 18, background: '#fef3c7', color: '#b45309', border: 'none' }}>
+              <i className="ph ph-receipt" />
+            </span>
+            <span>Donation Receipt</span>
+          </div>
+        }
         visible={receiptDialog.open}
         onHide={() => setReceiptDialog({ open: false })}
         style={{ width: 460 }}

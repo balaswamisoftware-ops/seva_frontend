@@ -10,13 +10,14 @@ import { Dropdown } from 'primereact/dropdown';
 import { Calendar } from 'primereact/calendar';
 import { Tag } from 'primereact/tag';
 import { MultiSelect } from 'primereact/multiselect';
+import { InputSwitch } from 'primereact/inputswitch';
 import { Message } from 'primereact/message';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
-import { Card } from 'primereact/card';
 import { eventsApi, sevasApi } from '@/api';
 import type { Event, EventStatus, Seva, SevaEventRef } from '@/types';
 import { toastSuccess, toastError } from '@/components/toast';
 import { apiErrorMessage, formatDateTime, formatINR } from '@/utils/format';
+import PageHeader from '@/components/PageHeader';
 
 const STATUS_OPTIONS = [
   { label: 'Upcoming', value: 'UPCOMING' },
@@ -41,7 +42,7 @@ export default function EventsPage() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<Event | null>(null);
   const [form, setForm] = useState<any>({
-    eventName: '', description: '', startDate: null, endDate: null, location: '', status: 'UPCOMING',
+    eventName: '', description: '', startDate: null, endDate: null, location: '', status: 'UPCOMING', collectDevoteeDetails: false,
   });
   const [pickedSevas, setPickedSevas] = useState<Seva[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -90,7 +91,7 @@ export default function EventsPage() {
 
   const reset = () => {
     setEditorOpen(false); setEditing(null);
-    setForm({ eventName: '', description: '', startDate: null, endDate: null, location: '', status: 'UPCOMING' });
+    setForm({ eventName: '', description: '', startDate: null, endDate: null, location: '', status: 'UPCOMING', collectDevoteeDetails: false });
     setPickedSevas([]);
   };
 
@@ -102,6 +103,7 @@ export default function EventsPage() {
       eventName: ev.eventName, description: ev.description ?? '',
       startDate: new Date(ev.startDate), endDate: new Date(ev.endDate),
       location: ev.location ?? '', status: ev.status,
+      collectDevoteeDetails: ev.collectDevoteeDetails ?? false,
     });
     setEditorOpen(true);
   };
@@ -169,23 +171,29 @@ export default function EventsPage() {
   );
 
   return (
-    <Card>
+    <div className="flex flex-column gap-3">
       <ConfirmDialog />
-      <div className="flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
-        <div className="flex gap-2">
-          <span className="p-input-icon-left">
-            <i className="ph ph-magnifying-glass" />
-            <InputText placeholder="Search events..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
-          </span>
-          <Dropdown
-            value={statusFilter} onChange={(e) => { setStatusFilter(e.value); setPage(1); }}
-            options={STATUS_OPTIONS} placeholder="All statuses" showClear
-          />
-        </div>
-        <Button label="New Event" icon="ph ph-plus" onClick={openCreate} style={{ background: '#b45309', borderColor: '#b45309' }} />
+      <PageHeader
+        icon="ph ph-calendar"
+        title="Events"
+        subtitle="Create and manage events, attach sevas, and toggle devotee collection."
+        actions={<Button label="New Event" icon="ph ph-plus" onClick={openCreate} className="p-button-rounded" style={{ background: '#fff', borderColor: '#fff', color: '#b45309' }} />}
+      />
+
+      <div className="soft-card flex align-items-center gap-2 flex-wrap">
+        <span className="p-input-icon-left">
+          <i className="ph ph-magnifying-glass" />
+          <InputText placeholder="Search events..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
+        </span>
+        <Dropdown
+          value={statusFilter} onChange={(e) => { setStatusFilter(e.value); setPage(1); }}
+          options={STATUS_OPTIONS} placeholder="All statuses" showClear
+        />
       </div>
 
+      <div className="soft-card p-0" style={{ overflow: 'hidden' }}>
       <DataTable
+        className="fancy-table"
         value={data?.items ?? []}
         loading={isLoading}
         paginator lazy
@@ -208,8 +216,19 @@ export default function EventsPage() {
           </div>
         )} />
       </DataTable>
+      </div>
 
-      <Dialog header={editing ? 'Edit Event' : 'New Event'} visible={editorOpen} onHide={reset} style={{ width: 600 }}>
+      <Dialog
+        header={
+          <div className="flex align-items-center gap-2">
+            <span className="page-head__icon" style={{ width: 38, height: 38, fontSize: 18, background: '#fef3c7', color: '#b45309', border: 'none' }}>
+              <i className={editing ? 'ph ph-pencil-simple' : 'ph ph-calendar'} />
+            </span>
+            <span>{editing ? 'Edit Event' : 'New Event'}</span>
+          </div>
+        }
+        visible={editorOpen} onHide={reset} style={{ width: 600 }}
+      >
         <div className="flex flex-column gap-3">
           <div>
             <label className="block text-sm font-semibold mb-1">Event Name *</label>
@@ -254,6 +273,17 @@ export default function EventsPage() {
           <div>
             <label className="block text-sm font-semibold mb-1">Status</label>
             <Dropdown className="w-full" value={form.status} onChange={(e) => setForm({ ...form, status: e.value })} options={STATUS_OPTIONS} />
+          </div>
+
+          <div className={`toggle-card ${form.collectDevoteeDetails ? 'is-on' : ''}`}>
+            <div className="flex align-items-start gap-2">
+              <i className="ph ph-identification-card text-2xl" style={{ color: '#b45309' }} />
+              <div>
+                <div className="toggle-card__title">Collect devotee details</div>
+                <small className="text-600">When on, phone number is mandatory for participation; name, gothram &amp; nakshatram stay optional.</small>
+              </div>
+            </div>
+            <InputSwitch checked={form.collectDevoteeDetails} onChange={(e) => setForm({ ...form, collectDevoteeDetails: e.value })} />
           </div>
 
           <div className="border-top-1 surface-border pt-3 mt-1">
@@ -315,6 +345,6 @@ export default function EventsPage() {
           </div>
         </div>
       </Dialog>
-    </Card>
+    </div>
   );
 }

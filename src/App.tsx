@@ -16,6 +16,9 @@ import DonationsPage from '@/pages/Donations';
 import DonationsHistoryPage from '@/pages/DonationsHistory';
 import DonationPurposesPage from '@/pages/DonationPurposes';
 import PrintersPage from '@/pages/Printers';
+import DevoteesPage from '@/pages/Devotees';
+import ParticipationPage from '@/pages/Participation';
+import AuditLogPage from '@/pages/AuditLog';
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const isAuth = useAuthStore((s) => s.isAuthenticated);
@@ -48,12 +51,15 @@ export default function App() {
           <Route path="donations" element={<DonationsPage />} />
           <Route path="donations/history" element={<DonationsHistoryPage />} />
           <Route path="tickets" element={<TicketsPage />} />
+          <Route path="devotees" element={<DevoteesPage />} />
+          <Route path="participation" element={<ParticipationPage />} />
           <Route path="events" element={<EventsPage />} />
           <Route path="sevas" element={<SevasPage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="employees" element={<SuperAdminRoute><EmployeesPage /></SuperAdminRoute>} />
           <Route path="donation-purposes" element={<SuperAdminRoute><DonationPurposesPage /></SuperAdminRoute>} />
           <Route path="printers" element={<SuperAdminRoute><PrintersPage /></SuperAdminRoute>} />
+          <Route path="audit" element={<SuperAdminRoute><AuditLogPage /></SuperAdminRoute>} />
           <Route path="settings" element={<SuperAdminRoute><OrgSettingsPage /></SuperAdminRoute>} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

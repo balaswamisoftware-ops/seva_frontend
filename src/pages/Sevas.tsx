@@ -10,11 +10,11 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Dropdown } from 'primereact/dropdown';
 import { Tag } from 'primereact/tag';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
-import { Card } from 'primereact/card';
 import { eventsApi, sevasApi } from '@/api';
 import type { Seva, SevaStatus } from '@/types';
 import { toastSuccess, toastError } from '@/components/toast';
 import { apiErrorMessage, formatINR } from '@/utils/format';
+import PageHeader from '@/components/PageHeader';
 
 const STATUS_OPTIONS = [
   { label: 'Active', value: 'ACTIVE' },
@@ -105,24 +105,30 @@ export default function SevasPage() {
     });
 
   return (
-    <Card>
+    <div className="flex flex-column gap-3">
       <ConfirmDialog />
-      <div className="flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
-        <div className="flex gap-2 flex-wrap">
-          <span className="p-input-icon-left">
-            <i className="ph ph-magnifying-glass" />
-            <InputText placeholder="Search sevas..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
-          </span>
-          <Dropdown
-            value={eventFilter} onChange={(e) => { setEventFilter(e.value); setPage(1); }}
-            options={eventList?.items ?? []} optionLabel="eventName" optionValue="_id"
-            placeholder="All events" showClear style={{ minWidth: 200 }}
-          />
-        </div>
-        <Button label="New Seva" icon="ph ph-plus" onClick={openCreate} style={{ background: '#b45309', borderColor: '#b45309' }} />
+      <PageHeader
+        icon="ph ph-gift"
+        title="Sevas"
+        subtitle="Manage seva offerings, pricing and ticket inventory. A seva can be attached to multiple events."
+        actions={<Button label="New Seva" icon="ph ph-plus" onClick={openCreate} className="p-button-rounded" style={{ background: '#fff', borderColor: '#fff', color: '#b45309' }} />}
+      />
+
+      <div className="soft-card flex align-items-center gap-2 flex-wrap">
+        <span className="p-input-icon-left">
+          <i className="ph ph-magnifying-glass" />
+          <InputText placeholder="Search sevas..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
+        </span>
+        <Dropdown
+          value={eventFilter} onChange={(e) => { setEventFilter(e.value); setPage(1); }}
+          options={eventList?.items ?? []} optionLabel="eventName" optionValue="_id"
+          placeholder="All events" showClear style={{ minWidth: 200 }}
+        />
       </div>
 
+      <div className="soft-card p-0" style={{ overflow: 'hidden' }}>
       <DataTable
+        className="fancy-table"
         value={data?.items ?? []}
         loading={isLoading}
         paginator lazy
@@ -155,8 +161,19 @@ export default function SevasPage() {
           </div>
         )} />
       </DataTable>
+      </div>
 
-      <Dialog header={editing ? 'Edit Seva' : 'New Seva'} visible={editorOpen} onHide={reset} style={{ width: 540 }}>
+      <Dialog
+        header={
+          <div className="flex align-items-center gap-2">
+            <span className="page-head__icon" style={{ width: 38, height: 38, fontSize: 18, background: '#fef3c7', color: '#b45309', border: 'none' }}>
+              <i className={editing ? 'ph ph-pencil-simple' : 'ph ph-gift'} />
+            </span>
+            <span>{editing ? 'Edit Seva' : 'New Seva'}</span>
+          </div>
+        }
+        visible={editorOpen} onHide={reset} style={{ width: 540 }}
+      >
         <div className="flex flex-column gap-3">
           <div>
             <label className="block text-sm font-semibold mb-1">Seva Name *</label>
@@ -186,6 +203,6 @@ export default function SevasPage() {
           </div>
         </div>
       </Dialog>
-    </Card>
+    </div>
   );
 }

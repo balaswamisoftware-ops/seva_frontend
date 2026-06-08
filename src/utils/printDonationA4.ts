@@ -263,7 +263,7 @@ function buildHtml(receipt: DonationReceiptPayload, settings?: A4ReceiptSettings
       <h1>${escapeHtml(org.name)}</h1>
       <div class="meta">${escapeHtml(org.address)}${org.contact ? `\nPh: ${escapeHtml(org.contact)}` : ''}${org.gst ? `\nGST: ${escapeHtml(org.gst)}` : ''}</div>
     </div>
-    ${s.showLogo ? `<div class="org-logo">${org.logoUrl ? `<img src="${escapeHtml(org.logoUrl)}" alt="logo"/>` : '🕉️'}</div>` : ''}
+    ${s.showLogo ? `<div class="org-logo">${org.logoUrl ? `<img src="${escapeHtml(org.logoUrl)}" alt="logo"/>` : 'ॐ'}</div>` : ''}
   </div>
   ${s.customHeader ? `<div class="custom-header">${escapeHtml(s.customHeader)}</div>` : ''}
 

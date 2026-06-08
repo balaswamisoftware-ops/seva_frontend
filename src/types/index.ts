@@ -28,6 +28,53 @@ export interface Event {
   location?: string;
   bannerImage?: string;
   status: EventStatus;
+  collectDevoteeDetails?: boolean;
+  createdAt: string;
+}
+
+export interface Devotee {
+  _id: string;
+  devoteeId: string;
+  fullName: string;
+  phoneNumber: string;
+  gothram?: string;
+  nakshatram?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EventParticipation {
+  _id: string;
+  participationId: string;
+  eventId: string;
+  eventName: string;
+  devoteeId?: string;
+  devoteeName?: string;
+  phoneNumber?: string;
+  sevaId?: string;
+  sevaName?: string;
+  quantity: number;
+  unitPrice?: number;
+  totalAmount?: number;
+  paymentMode: PaymentMode;
+  notes?: string;
+  createdAt: string;
+}
+
+export type AuditEntityType = 'Devotee' | 'Event' | 'EventParticipation';
+export type AuditActionType = 'CREATE' | 'UPDATE' | 'DELETE' | 'ROLLBACK';
+
+export interface AuditEntry {
+  _id: string;
+  entityType: AuditEntityType;
+  entityId: string;
+  entityCode?: string;
+  action: AuditActionType;
+  before?: any;
+  after?: any;
+  performedBy?: { _id: string; employeeId: string; firstName: string; lastName: string; role: Role } | string;
+  rolledBack?: boolean;
+  rollbackOf?: string;
   createdAt: string;
 }
 

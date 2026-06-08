@@ -16,12 +16,15 @@ const NAV: NavItem[] = [
   { label: 'Donations',         icon: 'ph ph-fill ph-heart',   to: '/donations' },
   { label: 'Donation History',  icon: 'ph ph-list',            to: '/donations/history' },
   { label: 'Tickets',           icon: 'ph ph-ticket',          to: '/tickets' },
+  { label: 'Devotees',          icon: 'ph ph-user-list',       to: '/devotees' },
+  { label: 'Participation',     icon: 'ph ph-hand-heart',      to: '/participation' },
   { label: 'Events',            icon: 'ph ph-calendar',        to: '/events' },
   { label: 'Sevas',             icon: 'ph ph-gift',            to: '/sevas' },
   { label: 'Reports',           icon: 'ph ph-chart-bar',       to: '/reports' },
   { label: 'Employees',         icon: 'ph ph-users',           to: '/employees',          superOnly: true },
   { label: 'Donation Purposes', icon: 'ph ph-tag',             to: '/donation-purposes',  superOnly: true },
   { label: 'Printers',          icon: 'ph ph-printer',         to: '/printers',           superOnly: true },
+  { label: 'Audit Log',         icon: 'ph ph-clock-counter-clockwise', to: '/audit',     superOnly: true },
   { label: 'Org Settings',      icon: 'ph ph-gear',            to: '/settings',           superOnly: true },
 ];
 
@@ -42,10 +45,14 @@ export default function AppLayout() {
     <div className="flex" style={{ height: '100vh', overflow: 'hidden' }}>
       {/* Sidebar */}
       <aside style={{ width: 240, background: '#fffbeb', borderRight: '1px solid #fef3c7', height: '100vh' }} className="flex flex-column">
-        <div className="p-4 text-center border-bottom-1" style={{ borderColor: '#fef3c7' }}>
-          <div className="text-2xl" style={{ color: '#b45309' }}>🕉️</div>
-          <div className="font-bold text-lg mt-1" style={{ color: '#92400e' }}>Seva ERP</div>
-          <div className="text-xs" style={{ color: '#a16207' }}>Sacred Service Management</div>
+        <div className="p-4 flex align-items-center gap-2 border-bottom-1" style={{ borderColor: '#fef3c7' }}>
+          <div className="flex align-items-center justify-content-center" style={{ width: 42, height: 42, borderRadius: 12, background: 'linear-gradient(135deg,#b45309,#f59e0b)', color: '#fff', flex: 'none' }}>
+            <i className="ph ph-flower-lotus" style={{ fontSize: 22 }} />
+          </div>
+          <div>
+            <div className="font-bold text-lg" style={{ color: '#92400e', lineHeight: 1.1 }}>Seva ERP</div>
+            <div className="text-xs" style={{ color: '#a16207' }}>Sacred Service Management</div>
+          </div>
         </div>
 
         <nav className="flex flex-column gap-1 p-2 flex-1 overflow-auto">

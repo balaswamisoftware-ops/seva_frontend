@@ -9,13 +9,13 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Dropdown } from 'primereact/dropdown';
 import { InputSwitch } from 'primereact/inputswitch';
 import { Tag } from 'primereact/tag';
-import { Card } from 'primereact/card';
 import { Message } from 'primereact/message';
 import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { printersApi } from '@/api';
 import type { Printer, PrinterStatus, PrinterType } from '@/types/printer';
 import { toastSuccess, toastError } from '@/components/toast';
 import { apiErrorMessage } from '@/utils/format';
+import PageHeader from '@/components/PageHeader';
 
 const TYPE_OPTIONS: { label: string; value: PrinterType }[] = [
   { label: 'Network (WiFi / Ethernet)', value: 'NETWORK' },
@@ -155,20 +155,17 @@ export default function PrintersPage() {
   };
 
   return (
-    <Card>
+    <div className="flex flex-column gap-3">
       <ConfirmDialog />
+      <PageHeader
+        icon="ph ph-printer"
+        title="Printers"
+        subtitle="Configure ESC/POS thermal printers for each counter."
+        actions={<Button label="Add Printer" icon="ph ph-plus" onClick={openCreate} className="p-button-rounded" style={{ background: '#fff', borderColor: '#fff', color: '#b45309' }} />}
+      />
 
-      <div className="flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
-        <div>
-          <div className="text-xl font-bold" style={{ color: '#92400e' }}>Printers</div>
-          <div className="text-500 text-sm">
-            Network printers print over WiFi/Ethernet directly from the server. USB printers go through a local print-agent.
-          </div>
-        </div>
-        <Button label="Add Printer" icon="ph ph-plus" onClick={openCreate} style={{ background: '#b45309', borderColor: '#b45309' }} />
-      </div>
-
-      <DataTable value={printers} loading={isLoading} emptyMessage="No printers yet">
+      <div className="soft-card p-0" style={{ overflow: 'hidden' }}>
+      <DataTable className="fancy-table" value={printers} loading={isLoading} emptyMessage="No printers yet">
         <Column field="name" header="Name" body={(r: Printer) => (
           <div className="flex flex-column">
             <span className="font-semibold">{r.name}</span>
@@ -202,9 +199,17 @@ export default function PrintersPage() {
           </div>
         )} />
       </DataTable>
+      </div>
 
       <Dialog
-        header={editing ? 'Edit Printer' : 'Add Printer'}
+        header={
+          <div className="flex align-items-center gap-2">
+            <span className="page-head__icon" style={{ width: 38, height: 38, fontSize: 18, background: '#fef3c7', color: '#b45309', border: 'none' }}>
+              <i className={editing ? 'ph ph-pencil-simple' : 'ph ph-printer'} />
+            </span>
+            <span>{editing ? 'Edit Printer' : 'Add Printer'}</span>
+          </div>
+        }
         visible={editorOpen}
         onHide={reset}
         style={{ width: 560 }}
@@ -334,6 +339,6 @@ export default function PrintersPage() {
           </div>
         </div>
       </Dialog>
-    </Card>
+    </div>
   );
 }
